@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.model.VkRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,10 +12,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
-import static com.example.constants.Constants.*;
-
 @Service
 public class BotService {
+
+    @Value("${vkAccessToken}")
+    private String vkAccessToken;
+
+    @Value("${vkApiUrl}")
+    private String vkApiUrl;
 
     public void sendMessage(VkRequest vkRequest) {
         int peerId = vkRequest.getObject().getMessage().getPeerId();
@@ -22,9 +27,9 @@ public class BotService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        headers.add("Authorization", "Bearer " + VK_ACCESS_TOKEN);
+        headers.add("Authorization", "Bearer " + vkAccessToken);
 
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(VK_API_URL)
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(vkApiUrl)
                 .queryParam("random_id", "{random_id}")
                 .queryParam("peer_id", "{peer_id}")
                 .queryParam("message", "{message}")
@@ -38,7 +43,7 @@ public class BotService {
                 "peer_id", String.valueOf(peerId),
                 "message", "Вы сказали: " + text,
                 "v", "5.199",
-                "access_token", VK_ACCESS_TOKEN
+                "access_token", vkAccessToken
         );
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
