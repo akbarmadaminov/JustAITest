@@ -33,3 +33,5 @@ This project is a simple VK bot service
     ```sh
     ./gradlew bootRun
     ```
+### 
+![alt text]([http://url/to/img.png](https://github.com/akbarmadaminov/JustAITest/blob/master/Screenshot%20from%202024-07-09%2001-05-47.png))
