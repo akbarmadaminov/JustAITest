@@ -1,8 +1,10 @@
 package com.example.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-public class MessageBody {
+@Data
+public class VkRequest {
     @JsonProperty("group_id")
     private int groupId;
 
@@ -20,6 +22,4 @@ public class MessageBody {
 
     @JsonProperty("client_info")
     private ClientInfo clientInfo;
-
-    // Getters and setters
 }

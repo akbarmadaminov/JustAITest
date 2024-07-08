@@ -1,6 +1,7 @@
 package com.example.controller;
 
-import com.example.service.SendMessage;
+import com.example.model.VkRequest;
+import com.example.service.BotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,14 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/callback")
-public class PostEvent {
+public class BotController {
 
     @Autowired
-    private SendMessage sendMessage;
+    private BotService botService;
 
     @PostMapping
-    public String postEvent(@RequestBody String requestBody) {
-        System.out.println("Received POST request with body: " + requestBody);
-        return "Received POST request with body: " + requestBody;
+    public String postMessage(@RequestBody VkRequest request) {
+        System.out.println("Received POST request with body: " + request);
+        botService.sendMessage(request);
+        return "ok";
     }
 }

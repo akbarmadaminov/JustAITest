@@ -1,37 +1,49 @@
 package com.example.service;
 
 import com.example.model.VkRequest;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.constants.Constants.*;
+
 @Service
-public class VkBotService {
+public class BotService {
 
-    @Value("${vk.api.token}")
-    private String vkApiToken;
+    public void sendMessage(VkRequest vkRequest) {
+        int peerId = vkRequest.getObject().getMessage().getPeerId();
+        String text = vkRequest.getObject().getMessage().getText();
 
-    @Value("${vk.api.version}")
-    private String vkApiVersion;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        headers.add("Authorization", "Bearer " + VK_ACCESS_TOKEN);
 
-    private static final String VK_API_URL = "https://api.vk.com/method/messages.send";
+        String urlTemplate = UriComponentsBuilder.fromHttpUrl(VK_API_URL)
+                .queryParam("random_id", "{random_id}")
+                .queryParam("peer_id", "{peer_id}")
+                .queryParam("message", "{message}")
+                .queryParam("v", "{v}")
+                .queryParam("access_token", "{access_token}")
+                .encode()
+                .toUriString();
 
-    public void sendMessage(VkRequest request) {
-        if ("message_new".equals(request.getType())) {
-            int peerId = request.getObject().getMessage().getPeerId();
-            String text = request.getObject().getMessage().getText();
+        Map<String, String> params = Map.of(
+                "random_id", "0",
+                "peer_id", String.valueOf(peerId),
+                "message", "Вы сказали: " + text,
+                "v", "5.199",
+                "access_token", VK_ACCESS_TOKEN
+        );
 
-            Map<String, String> params = new HashMap<>();
-            params.put("peer_id", String.valueOf(peerId));
-            params.put("message", text);
-            params.put("access_token", vkApiToken);
-            params.put("v", vkApiVersion);
-
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.postForObject(VK_API_URL, null, String.class, params);
-        }
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(urlTemplate, HttpMethod.POST, request, String.class, params);
+        System.out.println("Response from VK API: " + response.getBody());
     }
 }

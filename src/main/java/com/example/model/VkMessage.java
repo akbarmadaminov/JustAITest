@@ -1,10 +1,13 @@
-package com.example.;
+package com.example.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class VkMessage {
+
     @JsonProperty("date")
     private long date;
 
@@ -46,6 +49,4 @@ public class VkMessage {
 
     @JsonProperty("is_unavailable")
     private boolean isUnavailable;
-
-    // Getters and setters
 }
