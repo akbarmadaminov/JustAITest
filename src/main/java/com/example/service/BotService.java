@@ -1,54 +1,22 @@
 package com.example.service;
 
+import com.example.component.VkClient;
 import com.example.model.VkRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Map;
 
 @Service
+@Log4j2
 public class BotService {
 
-    @Value("${vkAccessToken}")
-    private String vkAccessToken;
-
-    @Value("${vkApiUrl}")
-    private String vkApiUrl;
+    @Autowired
+    private VkClient vkClient;
 
     public void sendMessage(VkRequest vkRequest) {
         int peerId = vkRequest.getObject().getMessage().getPeerId();
-        String text = vkRequest.getObject().getMessage().getText();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-        headers.add("Authorization", "Bearer " + vkAccessToken);
-
-        String urlTemplate = UriComponentsBuilder.fromHttpUrl(vkApiUrl)
-                .queryParam("random_id", "{random_id}")
-                .queryParam("peer_id", "{peer_id}")
-                .queryParam("message", "{message}")
-                .queryParam("v", "{v}")
-                .queryParam("access_token", "{access_token}")
-                .encode()
-                .toUriString();
-
-        Map<String, String> params = Map.of(
-                "random_id", "0",
-                "peer_id", String.valueOf(peerId),
-                "message", "Вы сказали: " + text,
-                "v", "5.199",
-                "access_token", vkAccessToken
-        );
-
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(urlTemplate, HttpMethod.POST, request, String.class, params);
-        System.out.println("Response from VK API: " + response.getBody());
+        String text = "Вы сказали: " + vkRequest.getObject().getMessage().getText();
+        log.info("Preparing to send message to peerId: {}, text: {}", peerId, text);
+        vkClient.sendMessage(peerId, text);
     }
 }
